@@ -16,6 +16,7 @@ class StatsHandler(HandlerBase):
 
         if self.query == 'fetch_ratings':
             s = db_session()
+            # We probably _could_ combine these queries.
             # Count skips received by media posted by users
             skips_recv = s.query(User, Media, Skip, func.count()).\
                 filter(Media.user == User.id).\
@@ -31,8 +32,8 @@ class StatsHandler(HandlerBase):
                 group_by(User.id)
             s.close()
             names_by_id = {}        # relevant users
-            skips_recv_by_id = {}   # skips received per user id
-            skips_sent_by_id = {}   # skips received per user id
+            skips_recv_by_id = {}   # # of skips received by userid's media
+            skips_sent_by_id = {}   # skips sent per user id
             posts_by_id = {}        # posts per user id
             collated = []
             for s in skips_recv.all():
@@ -62,7 +63,7 @@ class StatsHandler(HandlerBase):
                     name, skips_recv, skips_sent,
                     posts, float(skips_recv) / posts if posts > 0 else 0))
             out = []
-            k = 0
+            k = 1
             for c in collated:
                 out.append({
                     'number': k,
@@ -71,48 +72,6 @@ class StatsHandler(HandlerBase):
                     'skips_recv': c[2],
                     'posts': c[3],
                     'rating': c[4],
-                })
-                k += 1
-            self.send_message(out)
-
-        if self.query == 'fetch_most_received':
-            # TODO: THIS IS BRUTEFORCE, MAKE A BETTER QUERY
-            s = db_session()
-            skips = s.query(Skip, Media, User).filter(Media.id == Skip.media, User.id == Media.user).all()
-            s.close()
-            counts = {}
-            names = {}
-            for m in skips:
-                if m[2].id not in counts:
-                    counts[m[2].id] = 0
-                    names[m[2].id] = m[2].nickname
-                counts[m[2].id] += 1
-
-            out = []
-            k = 1
-            for m in sorted(counts.iteritems(), key=lambda x: x[1], reverse=True):
-                out.append({
-                    'number': k,
-                    'amount': m[1],
-                    'name': names[m[0]]
-                })
-                k += 1
-            self.send_message(out)
-
-        if self.query == 'fetch_most_given':
-            s = db_session()
-            skips = s.query(Skip.user, func.count(Skip.id).label('skips'), User)\
-                .filter(User.id == Skip.user)\
-                .group_by(Skip.user)\
-                .order_by('skips desc').all()
-            s.close()
-            out = []
-            k = 1
-            for skip in skips:
-                out.append({
-                    'number': k,
-                    'amount': skip[1],
-                    'name': skip[2].nickname
                 })
                 k += 1
             self.send_message(out)
