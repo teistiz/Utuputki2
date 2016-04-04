@@ -6,7 +6,7 @@ app.controller('StatisticsController', ['$scope', '$location', '$rootScope', 'SY
 
         $scope.ratings_opts = {
             enableFiltering: false,
-            enableSorting: false,
+            enableSorting: true,
             enableGridMenu: false,
             enableColumnMenus: false,
             enableHorizontalScrollbar: 0,
