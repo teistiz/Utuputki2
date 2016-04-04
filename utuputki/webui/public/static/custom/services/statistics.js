@@ -5,6 +5,7 @@ app.factory('Statistics', ['$location', '$rootScope', 'SockService', 'AUTH_EVENT
         var last_error = "";
         var most_received = [];
         var most_given = [];
+        var user_ratings = [];
 
         function stats_event(msg, query) {
             if (msg['error'] == 1) {
@@ -17,6 +18,11 @@ app.factory('Statistics', ['$location', '$rootScope', 'SockService', 'AUTH_EVENT
                 }
                 if(query == 'fetch_most_given') {
                     most_given = msg['data'];
+                    $rootScope.$broadcast(SYNC_EVENTS.statsRefresh);
+                    return;
+                }
+                if(query == 'fetch_ratings') {
+                    user_ratings = msg['data'];
                     $rootScope.$broadcast(SYNC_EVENTS.statsRefresh);
                     return;
                 }
@@ -39,6 +45,10 @@ app.factory('Statistics', ['$location', '$rootScope', 'SockService', 'AUTH_EVENT
             return most_received;
         }
 
+        function get_ratings() {
+            return user_ratings;
+        }
+
         function get_last_error() {
             return last_error;
         }
@@ -46,6 +56,7 @@ app.factory('Statistics', ['$location', '$rootScope', 'SockService', 'AUTH_EVENT
         function refresh() {
             SockService.send_msg('stats', {}, 'fetch_most_received');
             SockService.send_msg('stats', {}, 'fetch_most_given');
+            SockService.send_msg('stats', {}, 'fetch_ratings');
         }
 
         return {
@@ -53,6 +64,7 @@ app.factory('Statistics', ['$location', '$rootScope', 'SockService', 'AUTH_EVENT
             get_last_error: get_last_error,
             get_most_given: get_most_given,
             get_most_received: get_most_received,
+            get_ratings: get_ratings,
             refresh: refresh
         };
     }
