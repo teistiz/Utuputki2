@@ -102,7 +102,7 @@ class DownloadConsumer(MqConstants):
                         source.video_codec = v['vcodec']
                         source.video_w = v['width']
                         source.video_h = v['height']
-                        source.audio_bitrate = int(a['abr'])
+                        source.audio_bitrate = int(a.get('abr', 0))
                         source.audio_codec = a['acodec']
                     else:
                         source.video_codec = info['vcodec']
