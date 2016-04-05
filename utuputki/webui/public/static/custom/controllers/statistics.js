@@ -17,8 +17,8 @@ app.controller('StatisticsController', ['$scope', '$location', '$rootScope', 'SY
                 {name: 'Skips sent', field: 'skips_sent', width: 140},
                 {name: 'Skips received', field: 'skips_recv', width: 140},
                 {name: 'Posts', field: 'posts', width: 140},
-                {name: 'QUALITY index', field: 'rating', width: 140,
-                 cellFilter: 'number : 2'},
+                {name: 'Rating', displayName: 'QUALITY index',
+                 field: 'rating', width: 140, cellFilter: 'number : 2'},
             ],
             onRegisterApi: function(gridApi){
                 $scope.ratings_api = gridApi;
