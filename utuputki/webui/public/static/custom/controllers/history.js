@@ -14,7 +14,7 @@ app.controller('HistoryController', ['$scope', '$window', '$rootScope', '$locati
             rowHeight: 30,
             columnDefs: [
                 {name: 'Id', field: 'id', width: 60},
-                {name: 'Title', cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.url}}">{{row.entity.title}}</a></div>'},
+                {name: 'Title', field: 'title', cellTemplate: '<div class="ui-grid-cell-contents"><a href="{{row.entity.url}}">{{row.entity.title}}</a></div>'},
                 {name: 'Description', field: 'description'},
                 {name: 'Duration', field: 'duration', width: 90}
             ],
@@ -40,14 +40,6 @@ app.controller('HistoryController', ['$scope', '$window', '$rootScope', '$locati
             redo_visibility(value);
         });
 
-        $scope.getTableHeight = function() {
-            var rowHeight = 30; // your row height
-            var headerHeight = 30; // your header height
-            return {
-                height: ($scope.grid_opts.data.length * rowHeight + headerHeight) + "px"
-            };
-        };
-
         function refresh_grid() {
             if($scope.gridApi == null)
                 return;
@@ -67,13 +59,9 @@ app.controller('HistoryController', ['$scope', '$window', '$rootScope', '$locati
                 'On queue',
                 'Error'
             ];
-
-            $scope.grid_opts.data = [];
-            $scope.grid_opts.minRowsToShow = 0;
-            $scope.grid_opts.virtualizationThreshold = 0;
-
             var playlist = Playlist.get_playlist();
             var len = playlist.length;
+            var data = new Array(playlist.length);
             for(var i = 0; i < len; i++) {
                 var field = playlist[i];
                 var source = field.source;
@@ -88,7 +76,7 @@ app.controller('HistoryController', ['$scope', '$window', '$rootScope', '$locati
                 var duration = moment.duration(source.length_seconds, "seconds").format("hh:mm:ss", { trim: false });
 
                 // Add field
-                $scope.grid_opts.data.push({
+                data.push({
                     'id': i+1,
                     'title': source.title,
                     'description': source.description,
@@ -97,8 +85,7 @@ app.controller('HistoryController', ['$scope', '$window', '$rootScope', '$locati
                     'url': 'http://youtu.be/'+source.youtube_hash
                 });
             }
-            $scope.grid_opts.minRowsToShow = $scope.grid_opts.data.length;
-            $scope.grid_opts.virtualizationThreshold = $scope.grid_opts.data.length;
+            $scope.grid_opts.data = data;
             refresh_grid();
         }
 
